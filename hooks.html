@@ -1,0 +1,126 @@
+<HTML>
+	<TITLE>Витки жизненного цикла</TITLE>
+
+	<BODY>
+		<SCRIPT SRC="Vue.js"></SCRIPT>
+
+		<DIV ID="appVue">
+			<!-- Перечень сообщений, генерируемых витками жизненного цикла -->
+			<p v-for="m in message">{{ m }}</p>
+			<!-- Кнопки "Обновить" и "Уничтожить" -->
+			<input type="button" @click="toUpdate" v-model="msg"> <button @click="toDestroy">Уничтожить</button>
+		</DIV>
+
+		<SCRIPT>
+
+			var app = new Vue(
+  			{
+					//Раздел имени элемента Vue
+    				el: '#appVue',
+					//Раздел исходных данных
+    				data: 
+    				{
+						//Массив сообщений от витков жизненного цикла
+      					message: [],
+						//Отвечает за надпись на кнопке "Обновить"
+						msg:'Обновить',
+						//Вводится сброшенный признак для однократного
+						//сообщения об обновлении (без него сообщения
+						//генерируются в бесконечном цикле)
+						flgUpdated: false,
+						//Вводится сброшенный признак для однократного
+						//сообщения перед обновлением (без него сообщения
+						//генерируются в бесконечном цикле)
+						flgBefore: false,
+    				},
+					//Раздел методов
+					methods:
+					{
+						//Метод уничтожения объекта Vue
+						toDestroy:function()
+						{
+							this.$destroy();
+						},
+						//Метод обновления надписи на кнопке
+						toUpdate:function()
+						{
+							this.flgUpdated = false;
+							this.flgBefore = false;
+							this.msg += '.';
+						},						
+					},
+					//Виток "смонтировано"
+					mounted: function()
+					{
+						var now = new Date();
+						this.message.push("Объект смонтирован: " + now + " мс: " + now.getMilliseconds());
+					},
+					//Виток "перед монтажом"
+					beforeMount: function()
+					{
+						var now = new Date();
+						this.message.push("Перед монтажом объекта: " + now + " мс: " + now.getMilliseconds());
+					},
+					//Виток "перед созданием"
+					beforeCreate: function()
+					{
+						var now = new Date();
+						//Нельзя добавить сообщение в массив, так как массива, собственно, как объекта Vue
+						//ещё не существует
+						//this.message.push("Перед созданием объекта: " + now + " мс: " + now.getMilliseconds());
+						console.log("Перед созданием объекта: " + now + " мс: " + now.getMilliseconds());
+					},					
+					//Виток "создано"
+					created: function()
+					{
+						var now = new Date();
+						this.message.push("Объект создан: " + now + " мс: " + now.getMilliseconds());
+					},
+					//Виток "перед обновлением"
+					beforeUpdate: function()
+					{
+						//Если признак "перед обновлением" сброшен
+						if (!this.flgBefore)
+						{
+							var now = new Date();
+							this.message.push("Перед обновлением объекта: " + now + " мс: " + now.getMilliseconds());
+							//Выставляем признак "перед обновлением"
+							this.flgBefore = true;
+						}
+					},
+					//Виток "обновлено"
+					updated: function()
+					{
+						//Если признак обновления сброшен
+						if (!this.flgUpdated)
+						{
+							var now = new Date();
+							this.message.push("Объект обновлён: " + now + " мс: " + now.getMilliseconds());
+							//Выставляем признак обновления
+							this.flgUpdated = true;
+						}
+					},						
+					//Виток "Перед уничтожением"
+					beforeDestroy: function()
+					{
+						var now = new Date();
+						console.log("Перед уничтожением объекта: " + now + " мс: " + now.getMilliseconds());
+						//Объект готовится к уничтожению - его функциональность потеряно
+						//Данное сообщение в массив добавлено не будет
+						this.message.push("Перед уничтожением объекта: " + now + " мс: " + now.getMilliseconds());
+					},					
+					//Виток "Удалено"
+					destroyed: function()
+					{
+						var now = new Date();
+						console.log("Объект уничтожен: " + now + " мс: " + now.getMilliseconds());
+						//Массива, как и объекта тут уже не существует -
+						//Данное сообщение никуда добавлено не будет
+						this.message.push("Объект уничтожен: " + now + " мс: " + now.getMilliseconds());
+					},
+  			})
+		</SCRIPT>
+
+	</BODY>
+
+</HTML>
